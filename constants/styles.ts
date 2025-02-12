@@ -59,3 +59,5 @@ export const defaultStyles = StyleSheet.create({
 		gap: 20,
 	},
 })
+
+export { Colors }
