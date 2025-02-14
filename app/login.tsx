@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { defaultStyles } from '@/constants/styles'
 import colors from '@/constants/colors'
 import { StatusBar } from 'expo-status-bar'
 import { Ionicons } from '@expo/vector-icons'
+import { useRouter } from 'expo-router'
+import { isClerkAPIResponseError, useSignIn } from '@clerk/clerk-expo'
 
 enum LoginType {
 	Phone,
@@ -16,10 +18,30 @@ const Page = () => {
 	const [countryCode, setCountryCode] = useState('+1')
 	const [phoneNumber, setPhoneNumber] = useState('')
 	const keyboardVerticalOffset = Platform.OS === 'ios' ? 80 : 0
+	const router = useRouter()
+	const { signIn } = useSignIn()
 
 	const onLogIn = async (type: LoginType) => {
 		switch (type) {
 			case LoginType.Phone:
+				const fullPhoneNumber = `${countryCode}${phoneNumber}`
+				try {
+					const { supportedFirstFactors } = await signIn!.create({ identifier: fullPhoneNumber })
+					const firstPhoneFactor: any = supportedFirstFactors?.find((factor: any) => factor.strategy === 'phone_number')
+					const { phoneNumberId } = firstPhoneFactor
+					await signIn!.prepareFirstFactor({
+						strategy: 'phone_code',
+						phoneNumberId,
+					})
+
+					router.push({ pathname: '/verify/[phone]', params: { phone: fullPhoneNumber, signin: 'true' } })
+				} catch (error) {
+					if (isClerkAPIResponseError(error)) {
+						if (error.errors[0].code === 'form_identifier_not_found') {
+							Alert.alert('Error', error.errors[0].message)
+						}
+					}
+				}
 				break
 			case LoginType.Email:
 				break

@@ -2,15 +2,28 @@ import React, { useState } from 'react'
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { defaultStyles } from '@/constants/styles'
 import colors from '@/constants/colors'
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
+import { useSignUp } from '@clerk/clerk-expo'
 
 const Page = () => {
+	const router = useRouter()
 	const [countryCode, setCountryCode] = useState('+1')
 	const [phoneNumber, setPhoneNumber] = useState('')
 	const keyboardVerticalOffset = Platform.OS === 'ios' ? 80 : 0
+	const { signUp } = useSignUp()
 
-	const onSignUp = async () => {}
+	const onSignUp = async () => {
+		const fullPhoneNumber = `${countryCode}${phoneNumber}`
+		try {
+			await signUp!.create({ phoneNumber: fullPhoneNumber })
+			signUp!.preparePhoneNumberVerification()
+
+			router.push({ pathname: '/verify/[phone]', params: { phone: fullPhoneNumber } })
+		} catch (error) {
+			console.error('Error signing up:', error)
+		}
+	}
 
 	return (
 		<>
