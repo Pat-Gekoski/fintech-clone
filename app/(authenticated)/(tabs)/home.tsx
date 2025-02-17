@@ -6,6 +6,7 @@ import Dropdown from '@/app/components/Dropdown'
 import { useBalanceStore } from '@/store/balanceStore'
 import { v4 as uuid } from 'uuid'
 import { Ionicons } from '@expo/vector-icons'
+import WidgetList from '@/app/components/SortableList/WidgetList'
 
 const Page = () => {
 	const { balance, runTransaction, transactions, clearTransactions } = useBalanceStore()
@@ -50,6 +51,8 @@ const Page = () => {
 					</View>
 				))}
 			</View>
+			<Text style={[defaultStyles.sectionHeader, { marginBottom: 15 }]}>Widgets</Text>
+			<WidgetList />
 		</ScrollView>
 	)
 }
