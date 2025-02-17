@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import { Tabs } from 'expo-router'
 import { FontAwesome } from '@expo/vector-icons'
 import { Colors } from '@/constants/styles'
+import 'react-native-get-random-values' // polyfill for uuid to work with React Native
 
 const _layout = () => {
 	return (
