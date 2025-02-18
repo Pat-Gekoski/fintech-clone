@@ -10,6 +10,9 @@ import { StatusBar } from 'expo-status-bar'
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo'
 import { TokenCache } from '@clerk/clerk-expo/dist/cache'
 import * as SecureStore from 'expo-secure-store'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 SplashScreen.preventAutoHideAsync()
 
@@ -59,7 +62,7 @@ const RootLayout = () => {
 		const inAuthGroup = segments[0] === '(authenticated)'
 
 		if (isSignedIn && !inAuthGroup) {
-			router.replace('/(authenticated)/(tabs)/home')
+			router.replace('/(authenticated)/(tabs)/crypto')
 		} else if (!isSignedIn) {
 			router.replace('/')
 		}
@@ -151,10 +154,12 @@ const RootLayoutNav = () => {
 
 	return (
 		<ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache!}>
-			<GestureHandlerRootView style={{ flex: 1 }}>
-				<StatusBar style='dark' />
-				<RootLayout />
-			</GestureHandlerRootView>
+			<QueryClientProvider client={queryClient}>
+				<GestureHandlerRootView style={{ flex: 1 }}>
+					<StatusBar style='dark' />
+					<RootLayout />
+				</GestureHandlerRootView>
+			</QueryClientProvider>
 		</ClerkProvider>
 	)
 }
